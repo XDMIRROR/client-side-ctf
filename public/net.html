@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>BLEACH Enterprise | Network Gateway</title>
+    <style>
+        :root {
+            --primary-color: #004b87; --bg-color: #f4f7f6; --container-bg: #ffffff;
+            --text-main: #333333; --text-muted: #666666; --border-color: #e1e4e8;
+            --widget-bg: #fafbfc; --btn-bg: #004b87; --log-bg: #1e1e1e; --log-text: #4af626;
+        }
+        :root.dark-theme {
+            --primary-color: #58a6ff; --bg-color: #0d1117; --container-bg: #161b22;
+            --text-main: #c9d1d9; --text-muted: #8b949e; --border-color: #30363d;
+            --widget-bg: #0d1117; --btn-bg: #238636; --log-bg: #000;
+        }
+        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; transition: 0.3s; }
+        .header { background-color: var(--primary-color); color: white; padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; }
+        .container { background-color: var(--container-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 30px; max-width: 800px; margin: 40px auto; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .tool-card { border: 1px solid var(--border-color); border-radius: 6px; padding: 20px; background-color: var(--widget-bg); margin-bottom: 20px; }
+        button { background-color: var(--btn-bg); color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .log-console { background-color: var(--log-bg); color: var(--log-text); font-family: monospace; padding: 15px; border-radius: 6px; height: 120px; overflow-y: auto; font-size: 0.85em; margin-top: 20px; }
+        .header-controls button { background-color: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); margin-left: 10px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>BLEACH Network™</h1>
+        <div class="header-controls">
+            <button onclick="toggleTheme()">🌓 Theme</button>
+            <button onclick="toggleLanguage()">🌐 ES / EN</button>
+        </div>
+    </div>
+    <div class="container">
+        <h2>Configuración de Enlace de Red</h2>
+        <p style="color:var(--text-muted)">Gestión de endpoints de telemetría y redirección de tráfico legacy.</p>
+
+        <div class="tool-card">
+            <h4>📡 Sincronizar API de Telemetría</h4>
+            <p>Envía el token de sesión actual al recolector de datos corporativo.</p>
+            <button onclick="pocFetchHijack()">EJECUTAR SYNC</button>
+        </div>
+
+        <div class="tool-card">
+            <h4>🔗 Retorno a Portal Legacy</h4>
+            <p>Utiliza la configuración de retorno para volver al sistema anterior.</p>
+            <button onclick="pocOpenRedirect()">VOLVER AL PORTAL</button>
+        </div>
+
+        <div class="tool-card">
+            <h4>💬 Inyectar Módulo de Soporte</h4>
+            <p>Carga dinámicamente el script de chat externo para asistencia técnica.</p>
+            <button onclick="pocScriptInjection()">CARGAR CHAT</button>
+        </div>
+
+        <h3>Network Logs</h3>
+        <div class="log-console" id="log-console"></div>
+    </div>
+
+    <script>
+        function addLog(m) { const c = document.getElementById('log-console'); c.innerHTML += `<div>> ${m}</div>`; c.scrollTop = c.scrollHeight; }
+        function updateHash(k, v) { let c = {}; try { if(location.hash) c = JSON.parse(decodeURIComponent(location.hash.substring(1))); } catch(e){} c[k]=v; location.hash = JSON.stringify(c); }
+        function toggleTheme() { updateHash("theme", document.documentElement.classList.contains("dark-theme") ? "light" : "dark"); }
+        function toggleLanguage() { let l = "es"; try { l = JSON.parse(decodeURIComponent(location.hash.substring(1))).lang || "es"; } catch(e){} updateHash("lang", l === "es" ? "en" : "es"); }
+        
+        function merge(t, s) { for (let k in s) { if (typeof s[k] === 'object' && s[k] !== null) { if (!t[k]) t[k] = {}; merge(t[k], s[k]); } else { t[k] = s[k]; } } return t; }
+        function load() { let d = { lang: "es", theme: "light" }; try { if(location.hash) merge(d, JSON.parse(decodeURIComponent(location.hash.substring(1)))); } catch(e){} return d; }
+
+        function render() {
+            const c = load();
+            document.documentElement.className = c.theme === "dark" ? "dark-theme" : "";
+            addLog("Sistema listo. Esperando comandos...");
+        }
+
+        function pocFetchHijack() { let c = load(); let u = c.urlApi || "/internal/ping"; addLog(`Enviando token a: ${u}`); fetch(u).catch(e => addLog("Petición enviada (Ver Network tab)")); }
+        function pocOpenRedirect() { let c = load(); let d = c.returnTo || "#"; if(d!=="#") { addLog(`Redirigiendo a: ${d}`); window.location.href = d; } else addLog("Error: Destino no configurado."); }
+        function pocScriptInjection() { let c = load(); let s = c.analyticsHost || "/dummy.js"; let el = document.createElement('script'); el.src = s; document.body.appendChild(el); addLog(`Script cargado: ${s}`); }
+
+        window.onload = render; window.onhashchange = render;
+    </script>
+</body>
+</html>

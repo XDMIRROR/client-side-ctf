@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BLEACH Enterprise | IT Support</title>
+    <style>
+        /* Variables para el Tema Claro (Por defecto) */
+        :root {
+            --primary-color: #004b87;
+            --bg-color: #f4f7f6;
+            --container-bg: #ffffff;
+            --text-main: #333333;
+            --text-muted: #666666;
+            --border-color: #e1e4e8;
+            --info-bg: #f8faff;
+            --widget-bg: #fafbfc;
+            --success-color: #198754;
+            --code-bg: #e9ecef;
+            --code-color: #d63384;
+            --form-bg: #ffffff;
+            --btn-bg: #004b87;
+            --btn-hover: #003666;
+        }
+
+        /* Variables para el Tema Oscuro (Se activa por JS) */
+        :root.dark-theme {
+            --primary-color: #58a6ff;
+            --bg-color: #0d1117;
+            --container-bg: #161b22;
+            --text-main: #c9d1d9;
+            --text-muted: #8b949e;
+            --border-color: #30363d;
+            --info-bg: #1c2128;
+            --widget-bg: #0d1117;
+            --success-color: #7ee787;
+            --code-bg: #2d333b;
+            --code-color: #ff7b72;
+            --form-bg: #0d1117;
+            --btn-bg: #238636;
+            --btn-hover: #2ea043;
+        }
+
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: var(--bg-color); 
+            color: var(--text-main); 
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: background-color 0.3s;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 400;
+            letter-spacing: 1px;
+        }
+
+        .header-controls button {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 6px 12px;
+            margin-left: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+
+        .header-controls button:hover {
+            background-color: rgba(255, 255, 255, 0.25);
+        }
+
+        .container { 
+            background-color: var(--container-bg);
+            border: 1px solid var(--border-color); 
+            border-radius: 8px;
+            padding: 40px; 
+            max-width: 800px; 
+            margin: 40px auto; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        h2 { 
+            color: var(--primary-color); 
+            margin-top: 0;
+            border-bottom: 2px solid var(--border-color); 
+            padding-bottom: 10px; 
+        }
+
+        .info-box { 
+            color: var(--text-muted); 
+            background-color: var(--info-bg);
+            border-left: 4px solid var(--primary-color);
+            padding: 15px;
+            margin-bottom: 30px; 
+            border-radius: 0 4px 4px 0;
+            transition: background-color 0.3s;
+        }
+
+        code {
+            background-color: var(--code-bg);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: var(--code-color);
+        }
+
+        #widget-area { 
+            margin-top: 20px; 
+            border: 1px dashed var(--border-color); 
+            border-radius: 6px;
+            padding: 20px; 
+            background-color: var(--widget-bg);
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .widget-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+            margin-bottom: 15px;
+        }
+
+        .widget-title {
+            margin: 0;
+            color: var(--text-main);
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+        }
+
+        .widget-badge {
+            background-color: var(--success-color);
+            color: #0d1117;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            font-weight: bold;
+            letter-spacing: 1px;
+            box-shadow: 0 0 8px rgba(126, 231, 135, 0.3);
+        }
+
+        .widget-content {
+            padding: 10px 0;
+            font-size: 0.95em;
+        }
+
+        .widget-footer {
+            margin-top: 20px;
+            padding-top: 12px;
+            border-top: 1px dashed var(--border-color);
+            color: var(--text-muted);
+            text-align: right;
+            font-family: monospace;
+        }
+
+        .status-ok {
+            color: var(--success-color);
+            font-weight: 500;
+            margin: 0;
+        }
+
+        /* Estilos del formulario de contacto */
+        .support-form-container {
+            margin-top: 30px;
+            padding-top: 20px;
+        }
+
+        .ops-form {
+            background-color: var(--form-bg);
+            padding: 20px 0;
+        }
+
+        .ops-form label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.95em;
+            font-weight: 500;
+            color: var(--text-main);
+        }
+
+        .ops-form input[type="text"],
+        .ops-form select,
+        .ops-form textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+
+        .ops-form textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 20px;
+        }
+
+        .form-col {
+            flex: 1;
+        }
+
+        .ops-form button {
+            background-color: var(--btn-bg);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1em;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+
+        .ops-form button:hover {
+            background-color: var(--btn-hover);
+        }
+
+        .footer {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85em;
+            margin-top: 40px;
+            padding-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>BLEACH Systems™</h1>
+        <div class="header-controls">
+            <button onclick="toggleTheme()">🌓 Theme</button>
+            <button onclick="toggleLanguage()">🌐 ES / EN</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2 id="main-title">Portal de Soporte TI</h2>
+        
+        <div class="info-box">
+            <p id="welcome-msg">Utilice este portal para reportar incidencias técnicas a los administradores de <strong>BLEACH Enterprise</strong>.</p>
+            <p><small id="warning-msg"><strong>Nota de accesibilidad:</strong> Puede preconfigurar el tema o idioma de la aplicacion</small></p>
+        </div>
+        
+        <div id="widget-area">
+        </div>
+
+        <div class="support-form-container">
+            <h3 id="form-title">Abrir Nuevo Ticket</h3>
+            
+            <div class="ops-form">
+                <form id="ticket-form">
+                    
+                    <div class="form-row">
+                        <div class="form-col">
+                            <label for="emp-name" id="lbl-name">Nombre Completo</label>
+                            <input type="text" id="emp-name" placeholder="Ej. John Doe">
+                        </div>
+                        <div class="form-col">
+                            <label for="emp-id" id="lbl-id">ID de Empleado</label>
+                            <input type="text" id="emp-id" placeholder="BLCH-0000">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-col">
+                            <label for="category" id="lbl-category">Categoría del Problema</label>
+                            <select id="category">
+                                <option value="hardware" id="opt-hw">Problema de Hardware / Equipo</option>
+                                <option value="software" id="opt-sw">Software / Aplicaciones</option>
+                                <option value="network" id="opt-net">Redes / VPN / Conectividad</option>
+                                <option value="access" id="opt-acc">Accesos / Contraseñas</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <label for="description" id="lbl-desc">Descripción Detallada</label>
+                    <textarea id="description" placeholder="..."></textarea>
+                    
+                    <button type="submit" id="btn-submit">ENVIAR TICKET</button>
+                    
+                    <span id="alert-sent" style="display:none; color: var(--success-color); font-weight: bold; margin-top: 15px;"></span>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="footer-msg" class="footer">
+        &copy; 2026 BLEACH Enterprise Solutions. Todos los derechos reservados. Red Interna Clasificada.
+    </div>
+
+    <script>
+        // === DICCIONARIO DE IDIOMAS ===
+        const i18n = {
+            es: {
+                title: "Portal de Soporte TI",
+                welcome: "Utilice este portal para reportar incidencias técnicas a los administradores de <strong>BLEACH Enterprise</strong>.",
+                warning: "",
+                footer: "&copy; 2026 BLEACH Enterprise Solutions. Todos los derechos reservados. Red Interna Clasificada.",
+                
+                widgetTitle: "📢 Tablón de Estado del Sistema",
+                widgetStatus: "<p class='status-ok'>✓ Todos los sistemas corporativos están operando con normalidad. No hay interrupciones reportadas.</p>",
+                
+                formTitle: "Abrir Nuevo Ticket",
+                lblName: "Nombre Completo",
+                lblId: "ID de Empleado",
+                lblCategory: "Categoría del Problema",
+                optHw: "Problema de Hardware / Equipo",
+                optSw: "Software / Aplicaciones",
+                optNet: "Redes / VPN / Conectividad",
+                optAcc: "Accesos / Contraseñas",
+                lblDesc: "Descripción Detallada",
+                placeholderDesc: "Describa el problema detalladamente. Incluya códigos de error si los hay...",
+                btnSubmit: "ENVIAR TICKET"
+            },
+            en: {
+                title: "IT Support Portal",
+                welcome: "Use this portal to report technical issues to the <strong>BLEACH Enterprise</strong> administrators.",
+                warning: " ",
+                footer: "&copy; 2026 BLEACH Enterprise Solutions. All rights reserved. Classified Internal Network.",
+                
+                widgetTitle: "📢 System Status Board",
+                widgetStatus: "<p class='status-ok'>✓ All corporate systems are operating normally. No outages reported.</p>",
+                
+                formTitle: "Open New Ticket",
+                lblName: "Full Name",
+                lblId: "Employee ID",
+                lblCategory: "Issue Category",
+                optHw: "Hardware / Equipment Issue",
+                optSw: "Software / Applications",
+                optNet: "Network / VPN / Connectivity",
+                optAcc: "Access / Passwords",
+                lblDesc: "Detailed Description",
+                placeholderDesc: "Describe the issue in detail. Include any error codes if applicable...",
+                btnSubmit: "SUBMIT TICKET"
+            }
+        };
+
+        // === LÓGICA DE LOS BOTONES ===
+        function updateHashConfig(key, value) {
+            let currentConfig = {};
+            try {
+                if (location.hash) {
+                    currentConfig = JSON.parse(decodeURIComponent(location.hash.substring(1)));
+                }
+            } catch (e) {}
+            
+            currentConfig[key] = value;
+            location.hash = JSON.stringify(currentConfig);
+        }
+
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.contains("dark-theme");
+            updateHashConfig("theme", isDark ? "light" : "dark");
+        }
+
+        function toggleLanguage() {
+            let currentLang = "es";
+            try {
+                if (location.hash) {
+                    const parsed = JSON.parse(decodeURIComponent(location.hash.substring(1)));
+                    if (parsed.lang) currentLang = parsed.lang;
+                }
+            } catch (e) {}
+            
+            updateHashConfig("lang", currentLang === "es" ? "en" : "es");
+        }
+
+        // === LÓGICA CORE (VULNERABLE A PROTOTYPE POLLUTION EN CLIENTE - XSS) ===
+        function mergeConfigs(target, source) {
+            for (let key in source) {
+                if (typeof source[key] === 'object' && source[key] !== null) {
+                    if (!target[key]) target[key] = {};
+                    mergeConfigs(target[key], source[key]); 
+                } else {
+                    target[key] = source[key];
+                }
+            }
+            return target;
+        }
+
+        function loadUserProfile() {
+            let systemDefaults = { version: "3.1.0", module: "support", lang: "es" };
+            let userSettings = {};
+            
+            try {
+                if (location.hash) {
+                    const hashData = decodeURIComponent(location.hash.substring(1));
+                    userSettings = JSON.parse(hashData);
+                }
+            } catch (e) {
+                console.warn("BLEACH Core: No se pudo parsear la configuración del hash.");
+            }
+
+            // Fusión vulnerable en FRONTEND
+            mergeConfigs(systemDefaults, userSettings);
+            
+            return systemDefaults; 
+        }
+
+        function renderPage() {
+            const config = loadUserProfile();
+
+            if (config.theme === "dark") {
+                document.documentElement.classList.add("dark-theme");
+            } else {
+                document.documentElement.classList.remove("dark-theme");
+            }
+
+            const lang = (config.lang === "en") ? "en" : "es";
+            const texts = i18n[lang];
+
+            document.getElementById('main-title').innerHTML = texts.title;
+            document.getElementById('welcome-msg').innerHTML = texts.welcome;
+            document.getElementById('warning-msg').innerHTML = texts.warning;
+            document.getElementById('footer-msg').innerHTML = texts.footer;
+            
+            document.getElementById('form-title').innerText = texts.formTitle;
+            document.getElementById('lbl-name').innerText = texts.lblName;
+            document.getElementById('lbl-id').innerText = texts.lblId;
+            document.getElementById('lbl-category').innerText = texts.lblCategory;
+            document.getElementById('opt-hw').innerText = texts.optHw;
+            document.getElementById('opt-sw').innerText = texts.optSw;
+            document.getElementById('opt-net').innerText = texts.optNet;
+            document.getElementById('opt-acc').innerText = texts.optAcc;
+            document.getElementById('lbl-desc').innerText = texts.lblDesc;
+            document.getElementById('description').placeholder = texts.placeholderDesc;
+            document.getElementById('btn-submit').innerText = texts.btnSubmit;
+
+            const noticeConfig = {
+                title: texts.widgetTitle
+            };
+
+            const widgetArea = document.getElementById('widget-area');
+            const templateHtml = noticeConfig.template || texts.widgetStatus;
+            const timestamp = new Date().toLocaleTimeString();
+
+            widgetArea.innerHTML = `
+                <div class="widget-header">
+                    <h4 class="widget-title">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px; color: var(--primary-color);">
+                            <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+                            <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+                            <line x1="6" y1="6" x2="6.01" y2="6"></line>
+                            <line x1="6" y1="18" x2="6.01" y2="18"></line>
+                        </svg>
+                        ${noticeConfig.title}
+                    </h4>
+                    <span class="widget-badge">LIVE</span>
+                </div>
+                
+                <div class="widget-content">
+                    ${templateHtml} 
+                </div>
+                
+                <div class="widget-footer">
+                    <small>Última sincronización de telemetría: ${timestamp}</small>
+                </div>
+            `;
+        }
+
+        window.onload = renderPage;
+        window.onhashchange = renderPage;
+
+        // === ENVÍO DEL TICKET AL SERVIDOR NODE.JS ===
+        document.getElementById('ticket-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const payload = {
+                empName: document.getElementById('emp-name').value,
+                empId: document.getElementById('emp-id').value,
+                category: document.getElementById('category').value,
+                description: document.getElementById('description').value
+            };
+
+            fetch('/api/ticket', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.json())
+            .then(data => {
+                const alertBox = document.getElementById('alert-sent');
+                alertBox.style.display = 'block';
+                alertBox.innerText = data.message;
+            })
+            .catch(err => {
+                alert("Error crítico conectando con el servidor backend.");
+            });
+        });
+    </script>
+</body>
+</html>

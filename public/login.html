@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BLEACH Enterprise | Secure Login</title>
+    <style>
+        :root {
+            --primary-color: #004b87;
+            --bg-color: #f4f7f6;
+            --container-bg: #ffffff;
+            --text-main: #333333;
+            --border-color: #e1e4e8;
+            --danger-color: #dc3545;
+            --btn-bg: #004b87;
+            --btn-hover: #003666;
+        }
+
+        :root.dark-theme {
+            --primary-color: #58a6ff;
+            --bg-color: #0d1117;
+            --container-bg: #161b22;
+            --text-main: #c9d1d9;
+            --border-color: #30363d;
+            --btn-bg: #238636;
+            --btn-hover: #2ea043;
+        }
+
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: var(--bg-color); 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            transition: background-color 0.3s;
+        }
+
+        .login-card {
+            background-color: var(--container-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+
+        .subtitle {
+            color: var(--text-main);
+            font-size: 0.9em;
+            margin-bottom: 30px;
+            opacity: 0.7;
+        }
+
+        .form-group {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.85em;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-main);
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: var(--primary-color);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--btn-bg);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background-color 0.2s;
+        }
+
+        button:hover { background-color: var(--btn-hover); }
+
+        #error-msg {
+            color: var(--danger-color);
+            font-size: 0.85em;
+            margin-top: 20px;
+            display: none;
+            padding: 10px;
+            background: rgba(220, 53, 69, 0.1);
+            border-radius: 4px;
+        }
+
+        .footer-links {
+            margin-top: 25px;
+            font-size: 0.85em;
+            color: var(--primary-color);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .footer-links a {
+            text-decoration: none;
+            color: inherit;
+            cursor: pointer;
+        }
+
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+
+        .support-btn {
+            background-color: transparent;
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 8px;
+            margin-top: 15px;
+        }
+
+        .support-btn:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-card">
+        <div class="logo">BLEACH™</div>
+        <div class="subtitle" id="login-sub">Acceso Restringido a Personal TI</div>
+
+        <form id="login-form">
+            <div class="form-group">
+                <label for="username">Usuario</label>
+                <input type="text" id="username" placeholder="operator_id" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Contraseña</label>
+                <input type="password" id="password" placeholder="••••••••" required>
+            </div>
+            <button type="submit" id="btn-login">ACCEDER AL SISTEMA</button>
+        </form>
+
+        <div id="error-msg">Error: Credenciales no reconocidas en el nodo local.</div>
+
+        <div class="footer-links">
+            <a onclick="toggleTheme()">Cambiar Tema 🌓</a>
+            <hr style="width: 50%; border: 0; border-top: 1px solid var(--border-color);">
+            <p style="margin: 0; color: var(--text-muted); font-size: 0.9em;">¿Problemas con el acceso?</p>
+            <button onclick="window.location.href='/assets/index.html'" class="support-btn">Contactar con Soporte TI 🌐</button>
+        </div>
+    </div>
+
+    <script>
+        // === LÓGICA VULNERABLE (Prototype Pollution) ===
+        function mergeConfigs(target, source) {
+            for (let key in source) {
+                if (typeof source[key] === 'object' && source[key] !== null) {
+                    if (!target[key]) target[key] = {};
+                    mergeConfigs(target[key], source[key]);
+                } else {
+                    target[key] = source[key];
+                }
+            }
+            return target;
+        }
+
+        function loadSession() {
+            let sessionDefaults = { theme: "light", lang: "es" };
+            try {
+                if (location.hash) {
+                    const hashData = JSON.parse(decodeURIComponent(location.hash.substring(1)));
+                    mergeConfigs(sessionDefaults, hashData); 
+                }
+            } catch (e) {}
+            return sessionDefaults;
+        }
+
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.contains("dark-theme");
+            let config = {};
+            try { if(location.hash) config = JSON.parse(decodeURIComponent(location.hash.substring(1))); } catch(e){}
+            config.theme = isDark ? "light" : "dark";
+            location.hash = JSON.stringify(config);
+        }
+
+        function applySettings() {
+            const config = loadSession();
+            if (config.theme === "dark") document.documentElement.classList.add("dark-theme");
+            else document.documentElement.classList.remove("dark-theme");
+        }
+
+        // === ENVÍO AL SERVIDOR (Bypass vía Backend) ===
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const errorEl = document.getElementById('error-msg');
+            const usernameVal = document.getElementById('username').value;
+            const passwordVal = document.getElementById('password').value;
+
+            // Construimos el objeto. El atacante puede interceptar esto 
+            // y añadir el __proto__ malicioso antes de que llegue al servidor Node.js
+            const payload = {
+                username: usernameVal,
+                password: passwordVal
+            };
+
+            fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = data.redirect + location.hash;
+                } else {
+                    errorEl.style.display = 'block';
+                    errorEl.innerText = data.message;
+                }
+            })
+            .catch(err => {
+                errorEl.style.display = 'block';
+                errorEl.innerText = "Error de conexión con el nodo central.";
+            });
+        });
+
+        window.onload = applySettings;
+        window.onhashchange = applySettings;
+    </script>
+</body>
+</html>

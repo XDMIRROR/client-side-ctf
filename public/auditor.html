@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>BLEACH Enterprise | System Auditor</title>
+    <style>
+        /* (Mismos estilos básicos para coherencia) */
+        :root { --primary-color: #004b87; --bg-color: #f4f7f6; --container-bg: #ffffff; --text-main: #333333; --border-color: #e1e4e8; --danger: #dc3545; --log-bg: #1e1e1e; --log-text: #ff5555; }
+        :root.dark-theme { --primary-color: #58a6ff; --bg-color: #0d1117; --container-bg: #161b22; --border-color: #30363d; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; transition: 0.3s; }
+        .header { background-color: var(--primary-color); color: white; padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; }
+        .container { background-color: var(--container-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 30px; max-width: 800px; margin: 40px auto; }
+        .tool-card { border: 1px solid var(--border-color); border-radius: 6px; padding: 20px; background-color: #fafbfc; margin-bottom: 20px; }
+        button { background-color: #004b87; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .output-box { margin-top: 15px; padding: 15px; border: 1px dashed var(--border-color); background: #fff; min-height: 40px; border-radius: 4px; }
+        .log-console { background-color: var(--log-bg); color: var(--log-text); font-family: monospace; padding: 15px; border-radius: 6px; height: 100px; overflow-y: auto; font-size: 0.85em; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>BLEACH Auditor™</h1>
+        <div class="header-controls">
+            <button onclick="toggleTheme()" style="background:rgba(255,255,255,0.1); color:white; border:1px solid #fff;">🌓</button>
+        </div>
+    </div>
+    <div class="container">
+        <h2>Auditoría de Mensajes y Reportes</h2>
+        
+        <div class="tool-card">
+            <h4>🛡️ Previsualización de Notificaciones</h4>
+            <p>Prueba el motor de renderizado seguro de mensajes del sistema.</p>
+            <button onclick="pocSanitizerBypass()">RENDERIZAR TEST</button>
+            <div class="output-box" id="notice-output">Esperando entrada...</div>
+        </div>
+
+        <div class="tool-card">
+            <h4>📊 Generador de Reporte JSON</h4>
+            <p>Serializa los objetos de sistema para exportación manual.</p>
+            <button onclick="pocDoS()">GENERAR .TXT</button>
+        </div>
+
+        <h3>System Errors</h3>
+        <div class="log-console" id="log-console"></div>
+    </div>
+
+    <script>
+        function addLog(m) { const c = document.getElementById('log-console'); c.innerHTML += `<div>! ${m}</div>`; }
+        function merge(t, s) { for (let k in s) { if (typeof s[k] === 'object' && s[k] !== null) { if (!t[k]) t[k] = {}; merge(t[k], s[k]); } else { t[k] = s[k]; } } return t; }
+        function load() { let d = { lang: "es" }; try { if(location.hash) merge(d, JSON.parse(decodeURIComponent(location.hash.substring(1)))); } catch(e){} return d; }
+        function toggleTheme() { /* Lógica similar anterior */ }
+
+        function pocSanitizerBypass() {
+            let c = load();
+            let opts = c.purifyOptions || { allowedTags: ['b'] };
+            let input = "<img src=x onerror=alert('XSS_BYPASS')> <b>Mensaje de prueba</b>";
+            let out = input;
+            if (!opts.allowedTags.includes('img')) out = out.replace(/<img[^>]*>/g, "[FILTRADO]");
+            document.getElementById('notice-output').innerHTML = out;
+            addLog("Renderizado completado con filtros activos.");
+        }
+
+        function pocDoS() {
+            try {
+                let c = load();
+                let obj = { version: "4.0" };
+                addLog("Iniciando serialización...");
+                let report = obj.toString(); // Gadget DoS
+                alert("Reporte generado correctamente: " + report);
+            } catch (e) {
+                addLog("ERROR FATAL: " + e.message);
+                console.error(e);
+            }
+        }
+        window.onload = () => { if(load().theme === "dark") document.documentElement.classList.add("dark-theme"); };
+    </script>
+</body>
+</html>

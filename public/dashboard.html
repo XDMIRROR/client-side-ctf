@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BLEACH Enterprise | Dashboard</title>
+    <style>
+        /* Variables para el Tema Claro (Por defecto) */
+        :root {
+            --primary-color: #004b87;
+            --bg-color: #f4f7f6;
+            --container-bg: #ffffff;
+            --text-main: #333333;
+            --text-muted: #666666;
+            --border-color: #e1e4e8;
+            --info-bg: #f8faff;
+            --widget-bg: #fafbfc;
+            --success-color: #198754;
+            --warning-color: #d97706;
+            --danger-color: #dc3545;
+            --code-bg: #e9ecef;
+            --code-color: #d63384;
+            --form-bg: #ffffff;
+            --btn-bg: #004b87;
+            --btn-hover: #003666;
+            --table-hover: #f1f3f5;
+        }
+
+        /* Variables para el Tema Oscuro (Se activa por JS) */
+        :root.dark-theme {
+            --primary-color: #58a6ff;
+            --bg-color: #0d1117;
+            --container-bg: #161b22;
+            --text-main: #c9d1d9;
+            --text-muted: #8b949e;
+            --border-color: #30363d;
+            --info-bg: #1c2128;
+            --widget-bg: #0d1117;
+            --success-color: #7ee787;
+            --warning-color: #e3b341;
+            --danger-color: #f85149;
+            --code-bg: #2d333b;
+            --code-color: #ff7b72;
+            --form-bg: #0d1117;
+            --btn-bg: #238636;
+            --btn-hover: #2ea043;
+            --table-hover: #21262d;
+        }
+
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: var(--bg-color); 
+            color: var(--text-main); 
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 10px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: background-color 0.3s;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 400;
+            letter-spacing: 1px;
+            cursor: pointer;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            margin-right: auto;
+            margin-left: 30px;
+        }
+
+        .nav-links a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: white;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+        }
+
+        .header-controls button {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 6px 12px;
+            margin-left: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: background-color 0.3s;
+        }
+
+        .header-controls button:hover {
+            background-color: rgba(255, 255, 255, 0.25);
+        }
+
+        .btn-logout {
+            background-color: var(--danger-color) !important;
+            border: none !important;
+        }
+
+        .container { 
+            background-color: var(--container-bg);
+            border: 1px solid var(--border-color); 
+            border-radius: 8px;
+            padding: 40px; 
+            max-width: 800px; 
+            margin: 40px auto; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        h2 { 
+            color: var(--primary-color); 
+            margin-top: 0;
+            border-bottom: 2px solid var(--border-color); 
+            padding-bottom: 10px; 
+        }
+
+        .info-box { 
+            color: var(--text-muted); 
+            background-color: var(--info-bg);
+            border-left: 4px solid var(--primary-color);
+            padding: 15px;
+            margin-bottom: 30px; 
+            border-radius: 0 4px 4px 0;
+        }
+
+        #access-denied {
+            text-align: center;
+            padding: 40px 20px;
+            border: 2px dashed var(--danger-color);
+            border-radius: 8px;
+            background-color: rgba(220, 53, 69, 0.05);
+            margin-top: 20px;
+        }
+
+        #widget-area { 
+            margin-top: 20px; 
+            border: 1px solid var(--border-color); 
+            border-radius: 6px;
+            padding: 25px; 
+            background-color: var(--widget-bg);
+        }
+
+        .widget-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+            margin-bottom: 15px;
+        }
+
+        .widget-badge {
+            background-color: var(--success-color);
+            color: #fff;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            font-weight: bold;
+        }
+
+        .server-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 0.9em;
+        }
+
+        .server-table th, .server-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .it-ops-panel {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px dashed var(--border-color);
+        }
+
+        .form-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .ops-form {
+            flex: 1;
+            background-color: var(--form-bg);
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            border-radius: 6px;
+        }
+
+        .ops-form button {
+            background-color: var(--btn-bg);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: bold;
+        }
+
+        .footer {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85em;
+            margin-top: 40px;
+            padding-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1 onclick="window.location.href='/dashboard'">BLEACH™</h1>
+        <nav class="nav-links">
+            <a href="/networking">Networking</a>
+            <a href="/auditor">Auditor</a>
+        </nav>
+        <div class="header-controls">
+            <button onclick="toggleTheme()">🌓 Tema</button>
+            <button onclick="toggleLanguage()">🌐 ES/EN</button>
+            <button onclick="handleLogout()" class="btn-logout">Sair / Logout</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2 id="main-title">Panel de Administración Central</h2>
+        
+        <div class="info-box">
+            <p id="welcome-msg">Cargando...</p>
+            <p><small id="warning-msg"></small></p>
+        </div>
+        
+        <div id="access-denied" style="display: none;">
+            <h3 id="denied-title">ACCESO DENEGADO</h3>
+            <p id="denied-msg">Se requiere rol administrativo.</p>
+        </div>
+
+        <div id="main-content" style="display: none;">
+            <div id="widget-area"></div>
+
+            <div class="it-ops-panel">
+                <h3 id="it-title">Panel de Operaciones de TI</h3>
+                <div class="form-container">
+                    <div class="ops-form">
+                        <h4 id="mail-form-title">Configuración de Correo</h4>
+                        <form onsubmit="event.preventDefault(); alert('Updating mail...');">
+                            <label>SMTP Server</label>
+                            <input type="text" value="mail.bleach.local" disabled>
+                            <label>Admin Email</label>
+                            <input type="text" placeholder="admin@bleach.local">
+                            <button type="submit" id="btn-update-mail">UPDATE MAIL</button>
+                        </form>
+                    </div>
+
+                    <div class="ops-form">
+                        <h4 id="update-form-title">Sistema</h4>
+                        <form onsubmit="event.preventDefault(); alert('Running update...');">
+                            <label>Nodo</label>
+                            <input type="text" value="BLEACH-CORE-01" disabled>
+                            <label>Token</label>
+                            <input type="password" placeholder="Token TI">
+                            <button type="submit" id="btn-run-update">RUN UPDATE</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="footer-msg" class="footer"></div>
+
+    <script>
+        const serverData = [
+            { node: "BLEACH-WEB-01", ip: "10.0.1.12", cpu: "24%", isAlert: false },
+            { node: "BLEACH-DB-MAIN", ip: "10.0.2.50", cpu: "92%", isAlert: true }
+        ];
+
+        const i18n = {
+            es: {
+                title: "Panel de Administración Central",
+                welcome: "Bienvenido al sistema de monitorización interna de <strong>BLEACH Enterprise</strong>.",
+                warning: "Aviso: perfiles JSON vía hash permitidos.",
+                footer: "&copy; 2026 BLEACH Enterprise Solutions.",
+                deniedTitle: "ACCESO DENEGADO",
+                deniedMsg: "No se ha detectado rol admin.",
+                widgetTitle: "Estado de la Infraestructura",
+                itTitle: "Panel de Operaciones de TI",
+                btnUpdateMail: "ACTUALIZAR CORREO",
+                btnRunUpdate: "EJECUTAR ACTUALIZACIÓN"
+            },
+            en: {
+                title: "Central Administration Panel",
+                welcome: "Welcome to the <strong>BLEACH Enterprise</strong> internal monitoring system.",
+                warning: "Notice: JSON profiles via hash allowed.",
+                footer: "&copy; 2026 BLEACH Enterprise Solutions.",
+                deniedTitle: "ACCESS DENIED",
+                deniedMsg: "No admin role detected.",
+                widgetTitle: "Infrastructure Status",
+                itTitle: "IT Operations Panel",
+                btnUpdateMail: "UPDATE MAIL",
+                btnRunUpdate: "RUN UPDATE"
+            }
+        };
+
+        function updateHashConfig(key, value) {
+            let currentConfig = {};
+            try { if (location.hash) currentConfig = JSON.parse(decodeURIComponent(location.hash.substring(1))); } catch (e) {}
+            currentConfig[key] = value;
+            location.hash = JSON.stringify(currentConfig);
+        }
+
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.contains("dark-theme");
+            updateHashConfig("theme", isDark ? "light" : "dark");
+        }
+
+        function toggleLanguage() {
+            let currentLang = "es";
+            try { if (location.hash) currentLang = JSON.parse(decodeURIComponent(location.hash.substring(1))).lang || "es"; } catch (e) {}
+            updateHashConfig("lang", currentLang === "es" ? "en" : "es");
+        }
+
+        // LÓGICA VULNERABLE
+        function mergeConfigs(target, source) {
+            for (let key in source) {
+                if (typeof source[key] === 'object' && source[key] !== null) {
+                    if (!target[key]) target[key] = {};
+                    mergeConfigs(target[key], source[key]); 
+                } else {
+                    target[key] = source[key];
+                }
+            }
+            return target;
+        }
+
+        function loadUserProfile() {
+            let systemDefaults = { version: "2.4.1", lang: "es" };
+            let userSettings = {};
+            try { if (location.hash) userSettings = JSON.parse(decodeURIComponent(location.hash.substring(1))); } catch (e) {}
+            mergeConfigs(systemDefaults, userSettings);
+            return systemDefaults; 
+        }
+
+        // GADGET DE LOGOUT POISONING
+        function handleLogout() {
+            const config = loadUserProfile();
+            // Borrar cookie (browser side)
+            document.cookie = "auth_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            
+            // Si el atacante inyecta "logoutRedirect", puede redirigir a donde quiera (Open Redirect)
+            const target = config.logoutRedirect || "/";
+            window.location.href = target;
+        }
+
+        // ... (resto del código igual)
+
+        function renderDashboard() {
+            const config = loadUserProfile();
+            
+            // Cambiamos el tema
+            if (config.theme === "dark") document.documentElement.classList.add("dark-theme");
+            else document.documentElement.classList.remove("dark-theme");
+
+            const lang = config.lang === "en" ? "en" : "es";
+            const texts = i18n[lang];
+
+            // Renderizado de textos básicos
+            document.getElementById('main-title').innerHTML = texts.title;
+            document.getElementById('welcome-msg').innerHTML = texts.welcome;
+            document.getElementById('warning-msg').innerHTML = texts.warning;
+            document.getElementById('footer-msg').innerHTML = texts.footer;
+
+            const accessDeniedBlock = document.getElementById('access-denied');
+            const mainContentBlock = document.getElementById('main-content');
+
+            // --- CAMBIO CLAVE AQUÍ ---
+            // Usamos una evaluación de veracidad simple. 
+            // Si config.admin no existe en el objeto, lo buscará en el __proto__ contaminado.
+            if (config.admin) { 
+                accessDeniedBlock.style.display = 'none';
+                mainContentBlock.style.display = 'block';
+                
+                // Actualizar textos del panel IT
+                document.getElementById('it-title').innerText = texts.itTitle;
+                document.getElementById('btn-update-mail').innerText = texts.btnUpdateMail;
+                document.getElementById('btn-run-update').innerText = texts.btnRunUpdate;
+
+                // Renderizado del Widget
+                let rowsHtml = serverData.map(s => `<tr><td>${s.node}</td><td>${s.ip}</td><td>${s.cpu}</td><td class="${s.isAlert?'status-warning':'status-ok'}">ONLINE</td></tr>`).join('');
+                
+                const widgetSettings = {}; // Objeto vacío para forzar búsqueda en prototipo
+                const title = widgetSettings.title || texts.widgetTitle;
+                const templateHtml = widgetSettings.template || `<table class="server-table"><thead><tr><th>Nodo</th><th>IP</th><th>CPU</th><th>Status</th></tr></thead><tbody>${rowsHtml}</tbody></table>`;
+                
+                document.getElementById('widget-area').innerHTML = `
+                    <div class="widget-header">
+                        <h4 class="widget-title">${title}</h4>
+                        <span class="widget-badge">LIVE</span>
+                    </div>
+                    <div class="widget-content">${templateHtml}</div>
+                    <div class="widget-footer"><small>Sync: ${new Date().toLocaleTimeString()}</small></div>
+                `;
+            } else {
+                accessDeniedBlock.style.display = 'block';
+                mainContentBlock.style.display = 'none';
+            }
+        }
+
+// ... (resto del código igual)
+
+        window.onload = renderDashboard;
+        window.onhashchange = renderDashboard;
+    </script>
+</body>
+</html>
